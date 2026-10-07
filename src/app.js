@@ -288,7 +288,8 @@ function activityChart(months, range) {
     const near = months.slice(Math.max(0, i - 1), i + 2);
     return near.reduce((n, m) => n + m.count, 0) / near.length;
   });
-  const max = Math.max(1, ...values);
+  const peakValue = Math.max(...values);
+  const max = peakValue || 1;
   const step = months.length > 1 ? W / (months.length - 1) : 0;
   const x = (i) => (months.length > 1 ? i * step : W / 2);
   const points = values.map((v, i) => [Math.round(x(i) * 10) / 10, Math.round((floor - (v / max) * (floor - top)) * 10) / 10]);
@@ -315,7 +316,7 @@ function activityChart(months, range) {
     })
     .join('');
 
-  const peak = values.indexOf(max);
+  const peak = values.indexOf(peakValue);
   const grid = [0.33, 0.66].map((f) => `<line class="grid" x1="0" x2="${W}" y1="${floor - f * (floor - top)}" y2="${floor - f * (floor - top)}"/>`).join('');
 
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Projekte pro Monat">

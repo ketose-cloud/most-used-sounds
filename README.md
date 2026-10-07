@@ -11,7 +11,7 @@ Durchsucht deine **FL Studio** (`.flp`) und **Ableton Live** (`.als`) Projekte, 
 
 1. **Projekte lesen.** `.als` ist gzip-komprimiertes XML: jede `<SampleRef>` ist ein benutzter Sound (Audio-Clips, Simpler, Sampler, Drum Racks). `.flp` ist ein binärer Event-Stream: Event 196 ist der Sample-Pfad eines Sampler-Kanals oder Audio-Clips.
 2. **Zählen.** Ein Sound ist ein Dateiname. Gerankt wird danach, in wie vielen Projekten ein Sound vorkommt, danach nach der Gesamtzahl der Verwendungen. Backups, Autosaves, Aufnahmen und Freeze- bzw. Bounce-Dateien werden ignoriert. Mitgelieferte Stock-Sounds der DAWs (FL-Studio-Factory-Packs, Ableton Core Library und Ableton-Packs) zählen nicht mit.
-3. **Einsortieren.** Die Kategorie (Kick, Snare, Clap, Hi-Hat, Open Hat, Cymbal, Perc, 808, FX, Vocal, Loop) kommt aus dem Dateinamen, sonst aus dem Ordnernamen.
+3. **Einsortieren.** Die Kategorie (Kick, Snare, Clap, Hi-Hat, Open Hat, Cymbal, Perc, 808, FX, Vocal, Loop) kommt aus dem Dateinamen, sonst aus dem Ordnernamen. „Nur Drums & FX“ packt Drums und Effekt-Sounds ins Pack, ohne Vocals, Loops und Sonstiges.
 4. **Finden und packen.** Die Projekte speichern nur Pfade. Deshalb wird jeder Sound in den Ordnern gesucht, die du hinzugefügt hast. Bei mehreren Treffern gewinnt die Datei, deren Ordner am besten zum gespeicherten Pfad passen. Das ZIP enthält `01 Kicks/01 …wav` usw. und eine `Most Used Sounds.txt` mit der Rangliste.
 
 **Fehlende Samples:** Projekte speichern nur Pfade, und der Browser darf nur in Ordner schauen, die du freigibst. Wenn Sounds fehlen, zeigt die App die Orte, auf die deine Projekte verweisen (z. B. `~/Desktop/MUSIC` oder die Ableton User Library). Ein Klick auf **Freigeben** liest nur diesen Ordner ein, ohne kompletten Neu-Scan.

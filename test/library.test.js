@@ -17,6 +17,12 @@ test('categorize: file names', () => {
   assert.equal(cat('Hat Loop 140bpm.wav'), 'loop');
   assert.equal(cat('Crash 2.aif'), 'cymbal');
   assert.equal(cat('Riser Long.wav'), 'fx');
+  assert.equal(cat('Sub Drop 2.wav'), 'fx');
+  assert.equal(cat('AirHorn_Loud.wav'), 'fx');
+  assert.equal(cat('Vinyl Scratch.wav'), 'fx');
+  assert.equal(cat('Dark Atmos.wav'), 'fx');
+  assert.equal(cat('C:\\Packs\\SFX\\Thing 4.wav'), 'fx');
+  assert.equal(cat('/Packs/Effects/Whatever.wav'), 'fx');
   assert.equal(cat('Mystery Sound.wav'), 'other');
 });
 

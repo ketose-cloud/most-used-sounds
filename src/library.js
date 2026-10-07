@@ -11,7 +11,7 @@ export const CATEGORIES = [
   { id: 'cymbal', label: 'Cymbals', drum: true },
   { id: 'perc', label: 'Percussion', drum: true },
   { id: '808', label: '808s', drum: true },
-  { id: 'fx', label: 'FX', drum: false },
+  { id: 'fx', label: 'FX', drum: true },
   { id: 'vocal', label: 'Vocals', drum: false },
   { id: 'loop', label: 'Loops', drum: false },
   { id: 'other', label: 'Sonstiges', drum: false },
@@ -28,8 +28,9 @@ const RULES = [
   ['kick', /\b(kicks?|kik|kck|bd|bass ?drum)\b/],
   ['cymbal', /\b(cymbals?|cym|crash(es)?|rides?|china|splash)\b/],
   ['perc', /\b(percs?|percussion|toms?|rims?|rimshot|shakers?|congas?|bongos?|tamb|tambourine|cowbell|clave|woodblock|triangle|guiro|cabasa|timbales?|djembe|tabla|knock|stick)\b/],
+  ['fx', /\b(sub ?drops?)\b/],
   ['808', /\b(808s?|subs?)\b/],
-  ['fx', /\b(fx|sfx|riser|impact|sweep|uplifter|downlifter|whoosh|swoosh|noise|transition|reverse)\b/],
+  ['fx', /\b(fx|sfx|effects?|effekte?|rise|risers?|uplifters?|downlifters?|downers?|impacts?|sweeps?|whoosh(es)?|swoosh(es)?|noise|transitions?|reverse|booms?|explosions?|zaps?|lasers?|sirens?|air ?horns?|scratch(es)?|vinyl|tape ?stop|glitch(es)?|stutters?|foley|atmos?|ambien(ce|t)|textures?|drones?|build ?ups?|gun ?shots?|guns?|reload|cash|coins?)\b/],
   ['vocal', /\b(vox|vocals?|voc|chant|adlib|phrase|voice)\b/],
 ];
 
