@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { aggregate, buildSelection, categorize, filterProjects, groupMissing, monthlyActivity, resolveSound, splitPath } from '../src/library.js';
+import { aggregate, buildSelection, categorize, filterProjects, groupMissing, isStockSound, monthlyActivity, resolveSound, splitPath } from '../src/library.js';
 
 const cat = (path) => categorize(splitPath(path));
 
@@ -106,22 +106,20 @@ test('aggregate: matches names regardless of Unicode normalization and case', ()
   assert.equal(sounds[0].projects, 2);
 });
 
-test('groupMissing: groups by library root, FL factory separately', () => {
+test('groupMissing: groups by library root', () => {
   const s = (path) => ({ name: path.split(/[\\/]/).at(-1), refPaths: new Set([path]) });
   const groups = groupMissing([
     s('/Users/gp/Desktop/MUSIC/Packs/2022 Sauce Kit/OPEN HATS/oh.wav'),
     s('/Users/gp/Desktop/MUSIC/Packs/Other/kick.wav'),
-    s('%FLStudioFactoryData%\\Data\\Patches\\Packs\\Legacy\\Drums\\Dance\\Basic 808 Clap.wav'),
     s('/Users/gp/Music/Ableton/User Library/Samples/Imported/808.wav'),
     s('C:\\Users\\gp\\Documents\\Samples\\Snare.wav'),
   ]);
   assert.deepEqual(
-    groups.map((g) => [g.path, g.count, g.factory]),
+    groups.map((g) => [g.path, g.count]),
     [
-      ['/Users/gp/Desktop/MUSIC', 2, false],
-      ['', 1, true],
-      ['/Users/gp/Music/Ableton/User Library', 1, false],
-      ['C:\\Users\\gp\\Documents\\Samples', 1, false],
+      ['/Users/gp/Desktop/MUSIC', 2],
+      ['/Users/gp/Music/Ableton/User Library', 1],
+      ['C:\\Users\\gp\\Documents\\Samples', 1],
     ],
   );
 });
@@ -134,4 +132,23 @@ test('monthlyActivity: counts projects per month up to now', () => {
     now,
   );
   assert.deepEqual(months.map((m) => [m.month, m.count]), [[7, 2], [8, 0], [9, 1]]);
+});
+
+test('isStockSound: FL Studio and Ableton factory content', () => {
+  for (const path of [
+    '%FLStudioFactoryData%/Data/Patches/Packs/Legacy/Drums/Dance/Basic 808 Clap.wav',
+    'C:\\Program Files\\Image-Line\\FL Studio 2024\\Data\\Patches\\Packs\\Drums\\Kicks\\Kick.wav',
+    '/Applications/FL Studio 2024.app/Contents/Resources/FL/Data/Patches/Packs/Drums/Hat.wav',
+    '/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Core Library/Samples/Kick.wav',
+    '/Users/gp/Music/Ableton/Factory Packs/Drum Booth/Samples/Snare.wav',
+    'C:\\ProgramData\\Ableton\\Live 12 Suite\\Resources\\Core Library\\Samples\\Clap.wav',
+  ]) assert.equal(isStockSound(path), true, path);
+  for (const path of [
+    '/Users/gp/Desktop/MUSIC/Packs/2022 Sauce Kit/OPEN HATS/oh.wav',
+    '/Users/gp/Music/Ableton/User Library/Samples/Imported/808.wav',
+    '%FLStudioUserData%/Packs/My Kick.wav',
+    'C:\\Users\\gp\\Documents\\Image-Line\\FL Studio\\Data\\My Kick.wav',
+    '/Users/gp/Samples/Basic Kick.wav',
+  ]) assert.equal(isStockSound(path), false, path);
+  assert.equal(aggregate([{ type: 'flp', mtime: 1, refs: ['%FLStudioFactoryData%/Data/Patches/Packs/Basic Kick.wav'] }]).length, 0);
 });

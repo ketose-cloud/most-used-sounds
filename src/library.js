@@ -78,7 +78,23 @@ export function categorize(segments) {
   return 'other';
 }
 
+// Stock content that ships with the DAWs: FL Studio factory packs and
+// Ableton's Core Library / installed packs.
+const STOCK_PATH = [
+  /%FLStudioFactoryData%/i,
+  /Program Files( \(x86\))?[\\/]Image-Line[\\/]/i,
+  /FL Studio[^\\/]*\.app[\\/]Contents[\\/]Resources[\\/]FL[\\/]Data[\\/]/i,
+  /(^|[\\/])(Core Library|Factory Packs)[\\/]/i,
+  /Ableton Live[^\\/]*\.app[\\/]/i,
+  /ProgramData[\\/]Ableton[\\/]/i,
+];
+
+export function isStockSound(rawPath) {
+  return STOCK_PATH.some((re) => re.test(rawPath));
+}
+
 export function isPickedSound(rawPath) {
+  if (isStockSound(rawPath)) return false;
   const segments = splitPath(rawPath);
   const name = segments.at(-1) ?? '';
   if (!AUDIO_EXT.has(extOf(name))) return false;
@@ -177,7 +193,6 @@ export function buildSelection(sounds, { perCat, drumsOnly, excluded, resolve })
 const LIBRARY_DIR = /^(music|musik|samples?|packs?|sounds?|splice|kits?|drum ?kits?|loops?|producing|production)$/i;
 
 function libraryRoot(raw) {
-  if (/%FLStudioFactoryData%/i.test(raw)) return { id: 'fl-factory', path: '', factory: true };
   const segments = splitPath(raw);
   const dirs = segments.slice(0, -1);
   let end = dirs.findIndex((s) => /^user library$/i.test(s));
@@ -186,7 +201,7 @@ function libraryRoot(raw) {
   const parts = dirs.slice(0, end + 1);
   const windows = /^[a-z]:/i.test(raw) || raw.includes('\\');
   const path = windows ? parts.join('\\') : (raw.startsWith('/') ? '/' : '') + parts.join('/');
-  return { id: parts.join('/').toLowerCase(), path, factory: false };
+  return { id: parts.join('/').toLowerCase(), path };
 }
 
 // Groups sounds that weren't found by the library folder they live in, so the

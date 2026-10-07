@@ -21,7 +21,14 @@ function valueOf(block, tag) {
   return m ? decodeXml(m[1]) : '';
 }
 
+// Samples from Ableton's own packs (Core Library, installed Packs) carry an
+// ableton.com pack id — that's stock content, not a sound the user picked.
+function isAbletonPack(block) {
+  return /ableton\.com/i.test(valueOf(block, 'LivePackId')) || /^core library$/i.test(valueOf(block, 'LivePackName'));
+}
+
 function pathFromFileRef(block) {
+  if (isAbletonPack(block)) return '';
   const absolute = valueOf(block, 'Path');
   if (absolute) return absolute;
   const relative = valueOf(block, 'RelativePath');

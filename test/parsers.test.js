@@ -113,7 +113,7 @@ const live10 = `<?xml version="1.0" encoding="UTF-8"?>
           <RelativePathElement Id="2" Dir="Drums" />
         </PathHint>
       </SearchHint>
-      <LivePackName Value="Core Library" />
+      <LivePackName Value="" />
     </FileRef>
     <SourceContext>
       <SourceContext>
@@ -140,4 +140,13 @@ test('Ableton: decompresses gzipped sets', async () => {
 
 test('Ableton: rejects non-Ableton XML', async () => {
   await assert.rejects(parseAbleton(new Uint8Array(gzipSync(Buffer.from('<foo/>')))));
+});
+
+test('Ableton: skips samples from Ableton packs (Core Library etc.)', () => {
+  const xml = `<Ableton>
+    <SampleRef><FileRef><Path Value="/Applications/Live.app/Kick.wav" /><LivePackName Value="Core Library" /><LivePackId Value="www.ableton.com/0" /></FileRef></SampleRef>
+    <SampleRef><FileRef><Path Value="/Users/me/Packs/Drum Booth/Snare.wav" /><LivePackName Value="Drum Booth" /><LivePackId Value="www.ableton.com/123" /></FileRef></SampleRef>
+    <SampleRef><FileRef><Path Value="/Users/me/Samples/Mine.wav" /><LivePackName Value="" /><LivePackId Value="" /></FileRef></SampleRef>
+  </Ableton>`;
+  assert.deepEqual(extractAbletonSamples(xml), ['/Users/me/Samples/Mine.wav']);
 });

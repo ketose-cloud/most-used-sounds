@@ -406,21 +406,11 @@ function renderMissing(missing) {
   const rows = state.missingGroups
     .slice(0, 6)
     .map((g, i) => {
-      let title = escapeHtml(g.path || 'Unbekannter Ort');
-      let sub = `z. B. ${g.names.map(escapeHtml).join(', ')}`;
-      let copy = !!g.path;
-      if (g.factory) {
-        title = 'FL Studio Factory-Samples';
-        copy = false;
-        sub = isMac
-          ? 'Finder → Programme → FL Studio → Rechtsklick „Paketinhalt zeigen“ → Contents/Resources/FL/Data/Patches/Packs. Diesen Ordner hier reinziehen.'
-          : 'C:\\Programme\\Image-Line\\FL Studio …\\Data\\Patches\\Packs';
-      }
       return `<li class="folder">
         <div class="folder-count"><b>${nf.format(g.count)}</b><span>Sounds</span></div>
-        <div><div class="folder-path">${title}</div><div class="folder-sub${g.factory ? ' steps' : ''}">${sub}</div></div>
+        <div><div class="folder-path">${escapeHtml(g.path || 'Unbekannter Ort')}</div><div class="folder-sub">z. B. ${g.names.map(escapeHtml).join(', ')}</div></div>
         <div class="folder-actions">
-          ${copy ? `<button class="btn ghost small" data-copy="${i}">Pfad kopieren</button>` : ''}
+          ${g.path ? `<button class="btn ghost small" data-copy="${i}">Pfad kopieren</button>` : ''}
           <button class="btn mint small" data-grant="${i}">Freigeben</button>
         </div>
       </li>`;
@@ -447,9 +437,7 @@ async function copyPath(path) {
 }
 
 function grantFolder(group) {
-  // Chrome's folder picker refuses C:\Program Files; the classic dialog doesn't.
-  if (group.factory && !isMac) return el.dirInput.click();
-  return chooseFolder(group.factory ? undefined : wellKnownFolder(group.path));
+  return chooseFolder(wellKnownFolder(group.path));
 }
 
 /* ---------- preview ---------- */

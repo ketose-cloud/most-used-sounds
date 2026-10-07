@@ -10,14 +10,13 @@ Durchsucht deine **FL Studio** (`.flp`) und **Ableton Live** (`.als`) Projekte, 
 ## So funktioniert's
 
 1. **Projekte lesen.** `.als` ist gzip-komprimiertes XML: jede `<SampleRef>` ist ein benutzter Sound (Audio-Clips, Simpler, Sampler, Drum Racks). `.flp` ist ein binärer Event-Stream: Event 196 ist der Sample-Pfad eines Sampler-Kanals oder Audio-Clips.
-2. **Zählen.** Ein Sound ist ein Dateiname. Gerankt wird danach, in wie vielen Projekten ein Sound vorkommt, danach nach der Gesamtzahl der Verwendungen. Backups, Autosaves, Aufnahmen und Freeze- bzw. Bounce-Dateien werden ignoriert.
+2. **Zählen.** Ein Sound ist ein Dateiname. Gerankt wird danach, in wie vielen Projekten ein Sound vorkommt, danach nach der Gesamtzahl der Verwendungen. Backups, Autosaves, Aufnahmen und Freeze- bzw. Bounce-Dateien werden ignoriert. Mitgelieferte Stock-Sounds der DAWs (FL-Studio-Factory-Packs, Ableton Core Library und Ableton-Packs) zählen nicht mit.
 3. **Einsortieren.** Die Kategorie (Kick, Snare, Clap, Hi-Hat, Open Hat, Cymbal, Perc, 808, FX, Vocal, Loop) kommt aus dem Dateinamen, sonst aus dem Ordnernamen.
 4. **Finden und packen.** Die Projekte speichern nur Pfade. Deshalb wird jeder Sound in den Ordnern gesucht, die du hinzugefügt hast. Bei mehreren Treffern gewinnt die Datei, deren Ordner am besten zum gespeicherten Pfad passen. Das ZIP enthält `01 Kicks/01 …wav` usw. und eine `Most Used Sounds.txt` mit der Rangliste.
 
-**Fehlende Samples:** Projekte speichern nur Pfade, und der Browser darf nur in Ordner schauen, die du freigibst. Wenn Sounds fehlen, zeigt die App die Orte, auf die deine Projekte verweisen (z. B. `~/Desktop/MUSIC`, die Ableton User Library oder die FL-Studio-Factory-Packs). Ein Klick auf **Freigeben** liest nur diesen Ordner ein, ohne kompletten Neu-Scan.
+**Fehlende Samples:** Projekte speichern nur Pfade, und der Browser darf nur in Ordner schauen, die du freigibst. Wenn Sounds fehlen, zeigt die App die Orte, auf die deine Projekte verweisen (z. B. `~/Desktop/MUSIC` oder die Ableton User Library). Ein Klick auf **Freigeben** liest nur diesen Ordner ein, ohne kompletten Neu-Scan.
 
-- macOS: Pfad kopieren, im Auswahlfenster ⌘⇧G drücken und einfügen. Die FL-Factory-Packs liegen in der App: Finder → Programme → FL Studio → Rechtsklick „Paketinhalt zeigen“ → `Contents/Resources/FL/Data/Patches/Packs`. Diesen Ordner einfach auf die Seite ziehen.
-- Windows: Die Factory-Packs liegen unter `C:\Program Files\Image-Line\FL Studio …\Data\Patches\Packs`. Chrome lässt diesen Ordner im normalen Dialog nicht zu, deshalb öffnet **Freigeben** dort den klassischen Ordner-Dialog.
+Tipp für macOS: Pfad kopieren, im Auswahlfenster ⌘⇧G drücken und einfügen. Unter Windows den Pfad in die Adresszeile des Dialogs einfügen.
 
 **Grenzen:** Samples, die nur in Plugin-Daten stecken (z. B. FPC, Slicex, DirectWave in FL Studio), stehen nicht als normaler Pfad in der Datei und werden deshalb nicht erkannt.
 
@@ -28,7 +27,7 @@ npm start      # http://localhost:5173 (braucht nur Python)
 npm test       # Parser-, Ranking- und ZIP-Tests (Node 20+)
 ```
 
-Es gibt keinen Build-Schritt und keine Abhängigkeiten. Das Projekt besteht nur aus HTML, CSS und ES-Modulen. Die Schrift (Space Grotesk, OFL) liegt in `fonts/` und wird nicht von Google geladen.
+Es gibt keinen Build-Schritt und keine Abhängigkeiten. Das Projekt besteht nur aus HTML, CSS und ES-Modulen. Als Schrift wird Helvetica vom System benutzt (Windows ohne Helvetica: Arial). Es werden keine Web-Fonts geladen.
 
 ## Kostenlos online stellen
 
