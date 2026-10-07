@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Most Used Sounds</title>
+  <meta name="description" content="Durchsucht deine FL-Studio- und Ableton-Projekte und baut aus deinen meistgenutzten Sounds ein Drum-Pack. Läuft komplett lokal im Browser.">
+  <meta name="theme-color" content="#0b0c12" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#eef0f7" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="src/app.js"></script>
+</head>
+<body>
+  <div class="bg" aria-hidden="true">
+    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span>
+  </div>
+
+  <main class="wrap">
+    <header class="hero">
+      <div class="logo glass" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><rect x="5" y="14" width="4" height="12" rx="2"/><rect x="11.5" y="6" width="4" height="20" rx="2"/><rect x="18" y="10" width="4" height="16" rx="2"/><rect x="24.5" y="17" width="4" height="9" rx="2"/></svg>
+      </div>
+      <h1>Most Used Sounds</h1>
+      <p class="sub">Dein Drum-Pack aus den Sounds, die du wirklich benutzt.</p>
+    </header>
+
+    <section id="pick" class="glass card">
+      <div id="drop" class="drop" tabindex="0" role="button" aria-label="Ordner auswählen">
+        <svg class="drop-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h3.6l2 2h7.4A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><path d="M12 10.5v6M9 13.5h6"/></svg>
+        <div class="drop-title">Ordner hier ablegen</div>
+        <div class="drop-hint">Projekt-Ordner (FL Studio &amp; Ableton) und Sample-Ordner</div>
+        <span class="btn ghost small">Ordner wählen</span>
+      </div>
+      <input id="dirInput" type="file" webkitdirectory multiple hidden>
+      <ul id="sources" class="chips"></ul>
+      <button id="scan" class="btn primary wide" disabled>Scannen</button>
+      <p class="privacy">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>
+        Läuft komplett in deinem Browser. Nichts wird hochgeladen.
+      </p>
+    </section>
+
+    <section id="progress" class="glass card progress" hidden>
+      <div class="spinner" aria-hidden="true"></div>
+      <div>
+        <div id="progressText" class="progress-title">Durchsuche Ordner…</div>
+        <div id="progressSub" class="muted"></div>
+      </div>
+    </section>
+
+    <section id="results" hidden>
+      <div id="stats" class="glass card stats"></div>
+
+      <div class="glass card settings">
+        <div class="setting">
+          <span class="label">Zeitraum</span>
+          <div id="range" class="seg" role="radiogroup"></div>
+        </div>
+        <div class="setting">
+          <span class="label">Sounds pro Kategorie</span>
+          <div class="slider">
+            <input id="perCat" type="range" min="3" max="25" step="1" value="10">
+            <output id="perCatValue">10</output>
+          </div>
+        </div>
+        <div class="setting">
+          <span class="label">Nur Drums</span>
+          <label class="switch"><input id="drumsOnly" type="checkbox" checked><span></span></label>
+        </div>
+        <div class="setting">
+          <span class="label">Name</span>
+          <input id="packName" class="text" type="text" maxlength="80" spellcheck="false">
+        </div>
+      </div>
+
+      <div id="cats" class="cats"></div>
+      <div id="missing" class="glass card missing" hidden></div>
+    </section>
+  </main>
+
+  <div id="dock" class="dock glass" hidden>
+    <span id="dockInfo"></span>
+    <button id="build" class="btn primary">Pack herunterladen</button>
+  </div>
+  <div id="toast" class="toast glass" role="status" hidden></div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "most-used-sounds",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Builds a drum pack from the sounds you use most in your FL Studio and Ableton projects. Runs entirely in the browser.",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 5173",
+    "test": "node --test"
+  }
+}
