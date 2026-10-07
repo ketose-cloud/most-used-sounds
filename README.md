@@ -14,7 +14,10 @@ Durchsucht deine **FL Studio** (`.flp`) und **Ableton Live** (`.als`) Projekte, 
 3. **Einsortieren.** Die Kategorie (Kick, Snare, Clap, Hi-Hat, Open Hat, Cymbal, Perc, 808, FX, Vocal, Loop) kommt aus dem Dateinamen, sonst aus dem Ordnernamen.
 4. **Finden und packen.** Die Projekte speichern nur Pfade. Deshalb wird jeder Sound in den Ordnern gesucht, die du hinzugefügt hast. Bei mehreren Treffern gewinnt die Datei, deren Ordner am besten zum gespeicherten Pfad passen. Das ZIP enthält `01 Kicks/01 …wav` usw. und eine `Most Used Sounds.txt` mit der Rangliste.
 
-**Tipp:** Füge den Projektordner *und* deine Sample-Ordner hinzu, oder einfach einen Ordner, der alles enthält (z. B. `Musik`). FL-Studio-Factory-Samples liegen im Programmordner (`…/Image-Line/FL Studio/Data/Patches/Packs`). Chrome lässt diesen Ordner nicht über den normalen Dialog zu, deshalb gibt es dafür den Link **Geschützten Ordner wählen**.
+**Fehlende Samples:** Projekte speichern nur Pfade, und der Browser darf nur in Ordner schauen, die du freigibst. Wenn Sounds fehlen, zeigt die App die Orte, auf die deine Projekte verweisen (z. B. `~/Desktop/MUSIC`, die Ableton User Library oder die FL-Studio-Factory-Packs). Ein Klick auf **Freigeben** liest nur diesen Ordner ein, ohne kompletten Neu-Scan.
+
+- macOS: Pfad kopieren, im Auswahlfenster ⌘⇧G drücken und einfügen. Die FL-Factory-Packs liegen in der App: Finder → Programme → FL Studio → Rechtsklick „Paketinhalt zeigen“ → `Contents/Resources/FL/Data/Patches/Packs`. Diesen Ordner einfach auf die Seite ziehen.
+- Windows: Die Factory-Packs liegen unter `C:\Program Files\Image-Line\FL Studio …\Data\Patches\Packs`. Chrome lässt diesen Ordner im normalen Dialog nicht zu, deshalb öffnet **Freigeben** dort den klassischen Ordner-Dialog.
 
 **Grenzen:** Samples, die nur in Plugin-Daten stecken (z. B. FPC, Slicex, DirectWave in FL Studio), stehen nicht als normaler Pfad in der Datei und werden deshalb nicht erkannt.
 
@@ -25,7 +28,7 @@ npm start      # http://localhost:5173 (braucht nur Python)
 npm test       # Parser-, Ranking- und ZIP-Tests (Node 20+)
 ```
 
-Es gibt keinen Build-Schritt und keine Abhängigkeiten. Das Projekt besteht nur aus HTML, CSS und ES-Modulen.
+Es gibt keinen Build-Schritt und keine Abhängigkeiten. Das Projekt besteht nur aus HTML, CSS und ES-Modulen. Die Schrift (Space Grotesk, OFL) liegt in `fonts/` und wird nicht von Google geladen.
 
 ## Kostenlos online stellen
 

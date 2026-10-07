@@ -5,84 +5,123 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Most Used Sounds</title>
   <meta name="description" content="Durchsucht deine FL-Studio- und Ableton-Projekte und baut aus deinen meistgenutzten Sounds ein Drum-Pack. Läuft komplett lokal im Browser.">
-  <meta name="theme-color" content="#0b0c12" media="(prefers-color-scheme: dark)">
-  <meta name="theme-color" content="#eef0f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#07080f">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/space-grotesk-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="src/app.js"></script>
 </head>
 <body>
-  <div class="bg" aria-hidden="true">
-    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span>
-  </div>
+  <div class="bg" aria-hidden="true"><span class="glow g1"></span><span class="glow g2"></span><span class="glow g3"></span><span class="dots"></span></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="14" width="4" height="12" rx="2"/><rect x="11.5" y="6" width="4" height="20" rx="2"/><rect x="18" y="10" width="4" height="16" rx="2"/><rect x="24.5" y="17" width="4" height="9" rx="2"/></svg>
+      <span>Most Used Sounds</span>
+    </div>
+    <span class="tag"><i></i>100 % lokal</span>
+  </header>
 
   <main class="wrap">
-    <header class="hero">
-      <div class="logo glass" aria-hidden="true">
-        <svg viewBox="0 0 32 32"><rect x="5" y="14" width="4" height="12" rx="2"/><rect x="11.5" y="6" width="4" height="20" rx="2"/><rect x="18" y="10" width="4" height="16" rx="2"/><rect x="24.5" y="17" width="4" height="9" rx="2"/></svg>
-      </div>
-      <h1>Most Used Sounds</h1>
-      <p class="sub">Dein Drum-Pack aus den Sounds, die du wirklich benutzt.</p>
-    </header>
+    <!-- Start -->
+    <section id="intro" class="intro">
+      <p class="eyebrow">// Drum-Pack-Generator</p>
+      <h1>Deine meist&shy;genutzten Sounds.<br><span>In einem Pack.</span></h1>
+      <p class="lead">Zieh deine FL-Studio- und Ableton-Ordner rein. Die App zählt, welche Samples du wirklich benutzt, und packt die besten in ein ZIP.</p>
+    </section>
 
-    <section id="pick" class="glass card">
-      <div id="drop" class="drop" tabindex="0" role="button" aria-label="Ordner auswählen">
-        <svg class="drop-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h3.6l2 2h7.4A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><path d="M12 10.5v6M9 13.5h6"/></svg>
-        <div class="drop-title">Ordner hier ablegen</div>
-        <div class="drop-hint">Projekt-Ordner (FL Studio &amp; Ableton) und Sample-Ordner</div>
-        <span class="btn ghost small">Ordner wählen</span>
+    <section id="pick" class="pick">
+      <div id="drop" class="orb" tabindex="0" role="button" aria-label="Ordner auswählen">
+        <svg class="rings" viewBox="0 0 320 320" aria-hidden="true">
+          <circle cx="160" cy="160" r="150" class="ring r1"/>
+          <circle cx="160" cy="160" r="128" class="ring r2"/>
+          <circle cx="160" cy="160" r="106" class="ring r3"/>
+        </svg>
+        <div class="knob">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h3.6l2 2h7.4A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><path d="M12 10.5v6M9 13.5h6"/></svg>
+          <span>Ordner</span>
+        </div>
       </div>
+      <p class="orb-hint">Ordner hier ablegen oder klicken.<br><span>Projekt-Ordner und Sample-Ordner, beliebig viele.</span></p>
       <input id="dirInput" type="file" webkitdirectory multiple hidden>
       <ul id="sources" class="chips"></ul>
-      <button id="scan" class="btn primary wide" disabled>Scannen</button>
-      <p class="privacy">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>
-        Läuft komplett in deinem Browser. Nichts wird hochgeladen.
-      </p>
+      <button id="scan" class="btn mint wide" disabled>Scannen <span aria-hidden="true">→</span></button>
     </section>
 
-    <section id="progress" class="glass card progress" hidden>
-      <div class="spinner" aria-hidden="true"></div>
-      <div>
-        <div id="progressText" class="progress-title">Durchsuche Ordner…</div>
-        <div id="progressSub" class="muted"></div>
+    <!-- Scanning -->
+    <section id="progress" class="progress" hidden>
+      <div class="orb busy" aria-hidden="true">
+        <svg class="rings" viewBox="0 0 320 320">
+          <circle cx="160" cy="160" r="150" class="ring r1"/>
+          <circle cx="160" cy="160" r="128" class="ring r2"/>
+          <circle cx="160" cy="160" r="106" class="ring r3"/>
+        </svg>
       </div>
+      <p id="progressLabel" class="eyebrow">// Durchsuche Ordner</p>
+      <div id="progressNumber" class="big-number">0</div>
+      <p id="progressSub" class="muted"></p>
     </section>
 
-    <section id="results" hidden>
-      <div id="stats" class="glass card stats"></div>
+    <!-- Results -->
+    <section id="results" class="results" hidden>
+      <div class="card sources-card span-3">
+        <ul id="sourcesCompact" class="chips"></ul>
+        <div class="sources-actions">
+          <button id="addMore" class="btn ghost small">+ Ordner</button>
+          <button id="rescan" class="btn ghost small">Neu scannen</button>
+        </div>
+      </div>
 
-      <div class="glass card settings">
-        <div class="setting">
-          <span class="label">Zeitraum</span>
-          <div id="range" class="seg" role="radiogroup"></div>
-        </div>
-        <div class="setting">
-          <span class="label">Sounds pro Kategorie</span>
-          <div class="slider">
-            <input id="perCat" type="range" min="3" max="25" step="1" value="10">
-            <output id="perCatValue">10</output>
-          </div>
-        </div>
-        <div class="setting">
-          <span class="label">Nur Drums</span>
-          <label class="switch"><input id="drumsOnly" type="checkbox" checked><span></span></label>
-        </div>
-        <div class="setting">
-          <span class="label">Name</span>
+      <div id="stats" class="stats span-3"></div>
+
+      <div id="missing" class="card missing span-3" hidden></div>
+
+      <article class="card activity span-3">
+        <header class="card-head">
+          <span class="badge" style="--c: var(--pink)"><svg viewBox="0 0 24 24"><path d="M3 12h4l2.5-6 4 12 2.5-6H21"/></svg></span>
+          <h2>Aktivität</h2>
+          <div class="head-value"><b id="rangeCount">0</b><span>Projekte</span></div>
+        </header>
+        <div id="chart" class="chart"></div>
+        <div id="range" class="seg" role="radiogroup" aria-label="Zeitraum"></div>
+      </article>
+
+      <article class="card mix span-2">
+        <header class="card-head">
+          <span class="badge" style="--c: var(--mint)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></svg></span>
+          <h2>Dein Sound-Mix</h2>
+          <span class="head-note">Anteil der Verwendungen</span>
+        </header>
+        <div id="mix" class="mix-body"></div>
+      </article>
+
+      <article class="card settings">
+        <header class="card-head">
+          <span class="badge" style="--c: var(--blue)"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></span>
+          <h2>Pack</h2>
+        </header>
+        <label class="field">
+          <span class="field-label">// Sounds pro Kategorie <output id="perCatValue">10</output></span>
+          <input id="perCat" type="range" min="3" max="25" step="1" value="10">
+        </label>
+        <label class="field row-field">
+          <span class="field-label">// Nur Drums</span>
+          <span class="switch"><input id="drumsOnly" type="checkbox" checked><span></span></span>
+        </label>
+        <label class="field">
+          <span class="field-label">// Name</span>
           <input id="packName" class="text" type="text" maxlength="80" spellcheck="false">
-        </div>
-      </div>
+        </label>
+      </article>
 
-      <div id="cats" class="cats"></div>
-      <div id="missing" class="glass card missing" hidden></div>
+      <div id="cats" class="cats span-3"></div>
     </section>
   </main>
 
-  <div id="dock" class="dock glass" hidden>
-    <span id="dockInfo"></span>
-    <button id="build" class="btn primary">Pack herunterladen</button>
+  <div id="dock" class="dock" hidden>
+    <div class="dock-info"><b id="dockCount">0</b><span id="dockSub">Sounds</span></div>
+    <button id="build" class="btn mint">Pack laden <span aria-hidden="true">↓</span></button>
   </div>
-  <div id="toast" class="toast glass" role="status" hidden></div>
+  <div id="toast" class="toast" role="status" hidden></div>
 </body>
 </html>

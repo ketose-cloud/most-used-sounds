@@ -41,6 +41,12 @@ export function splitPath(path) {
   return path.replace(/\\/g, '/').split('/').filter(Boolean);
 }
 
+// File names are compared case-insensitively and Unicode-normalized (macOS
+// stores "ü" decomposed, DAWs usually composed).
+export function soundKey(name) {
+  return name.normalize('NFC').toLowerCase();
+}
+
 export function extOf(name) {
   const i = name.lastIndexOf('.');
   return i < 0 ? '' : name.slice(i + 1).toLowerCase();
@@ -101,7 +107,7 @@ export function aggregate(projects) {
       if (!isPickedSound(raw)) continue;
       const segments = splitPath(raw);
       const name = segments.at(-1);
-      const key = name.toLowerCase();
+      const key = soundKey(name);
       let sound = sounds.get(key);
       if (!sound) {
         sound = { key, name, category: categorize(segments), refPaths: new Set(), projects: 0, uses: 0, lastUsed: 0 };
@@ -133,11 +139,11 @@ export function resolveSound(sound, audioIndex) {
   const candidates = audioIndex.get(sound.key);
   if (!candidates?.length) return null;
   if (candidates.length === 1) return candidates[0];
-  const refs = [...sound.refPaths].map((p) => splitPath(p.toLowerCase()));
+  const refs = [...sound.refPaths].map((p) => splitPath(soundKey(p)));
   let best = candidates[0];
   let bestScore = -1;
   for (const c of candidates) {
-    const segs = splitPath(c.path.toLowerCase());
+    const segs = splitPath(soundKey(c.path));
     for (const ref of refs) {
       const score = sharedTail(segs, ref);
       if (score > bestScore) [best, bestScore] = [c, score];
@@ -165,4 +171,55 @@ export function buildSelection(sounds, { perCat, drumsOnly, excluded, resolve })
     if (!off) group.picked++;
   }
   return { groups: [...groups.values()].filter((g) => g.items.length), missing };
+}
+
+// Folder names that usually mark the root of a sample library.
+const LIBRARY_DIR = /^(music|musik|samples?|packs?|sounds?|splice|kits?|drum ?kits?|loops?|producing|production)$/i;
+
+function libraryRoot(raw) {
+  if (/%FLStudioFactoryData%/i.test(raw)) return { id: 'fl-factory', path: '', factory: true };
+  const segments = splitPath(raw);
+  const dirs = segments.slice(0, -1);
+  let end = dirs.findIndex((s) => /^user library$/i.test(s));
+  if (end < 0) end = dirs.findIndex((s, i) => i >= 2 && LIBRARY_DIR.test(s));
+  if (end < 0) end = Math.min(3, dirs.length - 1);
+  const parts = dirs.slice(0, end + 1);
+  const windows = /^[a-z]:/i.test(raw) || raw.includes('\\');
+  const path = windows ? parts.join('\\') : (raw.startsWith('/') ? '/' : '') + parts.join('/');
+  return { id: parts.join('/').toLowerCase(), path, factory: false };
+}
+
+// Groups sounds that weren't found by the library folder they live in, so the
+// user can grant exactly those folders. Biggest groups first.
+export function groupMissing(missing) {
+  const groups = new Map();
+  for (const sound of missing) {
+    const root = libraryRoot([...sound.refPaths][0]);
+    if (!groups.has(root.id)) groups.set(root.id, { ...root, count: 0, names: [] });
+    const group = groups.get(root.id);
+    group.count++;
+    if (group.names.length < 3) group.names.push(sound.name);
+  }
+  return [...groups.values()].sort((a, b) => b.count - a.count);
+}
+
+// Projects per month, oldest first, for the activity chart.
+export function monthlyActivity(projects, maxMonths = 48, now = Date.now()) {
+  if (!projects.length) return [];
+  const end = new Date(now);
+  const first = new Date(Math.min(...projects.map((p) => p.mtime)));
+  let span = (end.getFullYear() - first.getFullYear()) * 12 + end.getMonth() - first.getMonth() + 1;
+  span = Math.max(1, Math.min(maxMonths, span));
+  const months = [];
+  for (let i = span - 1; i >= 0; i--) {
+    const d = new Date(end.getFullYear(), end.getMonth() - i, 1);
+    months.push({ year: d.getFullYear(), month: d.getMonth(), start: d.getTime(), count: 0 });
+  }
+  const index = new Map(months.map((m) => [m.year * 12 + m.month, m]));
+  for (const p of projects) {
+    const d = new Date(p.mtime);
+    const m = index.get(d.getFullYear() * 12 + d.getMonth());
+    if (m) m.count++;
+  }
+  return months;
 }

@@ -4,7 +4,7 @@
 
 import { parseAbleton } from './parsers/ableton.js';
 import { parseFlStudio } from './parsers/flstudio.js';
-import { AUDIO_EXT, extOf } from './library.js';
+import { AUDIO_EXT, extOf, soundKey } from './library.js';
 
 const PROJECT_EXT = new Set(['als', 'flp']);
 const SKIP_DIR = /^(backup|backups|__macosx|ableton project info|\$recycle\.bin|node_modules)$/i;
@@ -53,8 +53,10 @@ export async function sourcesFromDrop(dataTransfer) {
   return (await Promise.all(pending)).filter(Boolean);
 }
 
-export async function pickDirectory() {
-  return handleSource(await window.showDirectoryPicker({ id: 'most-used-sounds', mode: 'read' }));
+// startIn: one of the well-known folders (desktop, documents, downloads, music).
+export async function pickDirectory(startIn) {
+  const options = startIn ? { startIn, mode: 'read' } : { id: 'most-used-sounds', mode: 'read' };
+  return handleSource(await window.showDirectoryPicker(options));
 }
 
 export async function ensurePermission(handle) {
@@ -122,7 +124,7 @@ export async function scanSources(sources, onProgress = () => {}) {
       if (PROJECT_EXT.has(ext)) {
         if (!isBackupProject(item.name)) projectFiles.push({ ...item, ext });
       } else if (AUDIO_EXT.has(ext) && !item.name.startsWith('._')) {
-        const key = item.name.toLowerCase();
+        const key = soundKey(item.name);
         if (!audioIndex.has(key)) audioIndex.set(key, []);
         audioIndex.get(key).push(item);
         audio++;
@@ -148,7 +150,7 @@ export async function scanSources(sources, onProgress = () => {}) {
       seen.add(fingerprint);
       const bytes = new Uint8Array(await file.arrayBuffer());
       const refs = item.ext === 'als' ? await parseAbleton(bytes) : parseFlStudio(bytes);
-      projects.push({ name: file.name, path: item.path, type: item.ext, mtime: file.lastModified, refs });
+      projects.push({ name: file.name, path: item.path, type: item.ext, mtime: file.lastModified, refs, fingerprint });
     } catch (err) {
       failed.push({ path: item.path, error: err?.message ?? String(err) });
     }
@@ -156,4 +158,18 @@ export async function scanSources(sources, onProgress = () => {}) {
   }
 
   return { projects, audioIndex, failed, files, audio };
+}
+
+// Adds a scan of extra folders to an existing one (no need to re-read everything).
+export function mergeScans(base, extra) {
+  const known = new Set(base.projects.map((p) => p.fingerprint));
+  const audioIndex = new Map(base.audioIndex);
+  for (const [key, items] of extra.audioIndex) audioIndex.set(key, [...(audioIndex.get(key) ?? []), ...items]);
+  return {
+    projects: [...base.projects, ...extra.projects.filter((p) => !known.has(p.fingerprint))],
+    audioIndex,
+    failed: [...base.failed, ...extra.failed],
+    files: base.files + extra.files,
+    audio: base.audio + extra.audio,
+  };
 }

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { aggregate, buildSelection, categorize, filterProjects, resolveSound, splitPath } from '../src/library.js';
+import { aggregate, buildSelection, categorize, filterProjects, groupMissing, monthlyActivity, resolveSound, splitPath } from '../src/library.js';
 
 const cat = (path) => categorize(splitPath(path));
 
@@ -94,4 +94,44 @@ test('buildSelection: excluded sounds stay listed but free their slot', () => {
     ['Kick C.wav', false],
   ]);
   assert.equal(kicks.picked, 1);
+});
+
+test('aggregate: matches names regardless of Unicode normalization and case', () => {
+  const nfd = 'Kick Ü.wav'.normalize('NFD');
+  const sounds = aggregate([
+    { type: 'als', mtime: 1, refs: [`/a/${nfd}`] },
+    { type: 'flp', mtime: 2, refs: ['C:\\b\\KICK Ü.WAV'.normalize('NFC')] },
+  ]);
+  assert.equal(sounds.length, 1);
+  assert.equal(sounds[0].projects, 2);
+});
+
+test('groupMissing: groups by library root, FL factory separately', () => {
+  const s = (path) => ({ name: path.split(/[\\/]/).at(-1), refPaths: new Set([path]) });
+  const groups = groupMissing([
+    s('/Users/gp/Desktop/MUSIC/Packs/2022 Sauce Kit/OPEN HATS/oh.wav'),
+    s('/Users/gp/Desktop/MUSIC/Packs/Other/kick.wav'),
+    s('%FLStudioFactoryData%\\Data\\Patches\\Packs\\Legacy\\Drums\\Dance\\Basic 808 Clap.wav'),
+    s('/Users/gp/Music/Ableton/User Library/Samples/Imported/808.wav'),
+    s('C:\\Users\\gp\\Documents\\Samples\\Snare.wav'),
+  ]);
+  assert.deepEqual(
+    groups.map((g) => [g.path, g.count, g.factory]),
+    [
+      ['/Users/gp/Desktop/MUSIC', 2, false],
+      ['', 1, true],
+      ['/Users/gp/Music/Ableton/User Library', 1, false],
+      ['C:\\Users\\gp\\Documents\\Samples', 1, false],
+    ],
+  );
+});
+
+test('monthlyActivity: counts projects per month up to now', () => {
+  const now = new Date(2026, 9, 15).getTime();
+  const months = monthlyActivity(
+    [{ mtime: new Date(2026, 7, 3).getTime() }, { mtime: new Date(2026, 7, 20).getTime() }, { mtime: new Date(2026, 9, 1).getTime() }],
+    48,
+    now,
+  );
+  assert.deepEqual(months.map((m) => [m.month, m.count]), [[7, 2], [8, 0], [9, 1]]);
 });
